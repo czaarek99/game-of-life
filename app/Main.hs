@@ -28,21 +28,49 @@ fragmentShader =  "shaders/cube.frag"
 type Cell = (Float,Float)
 type Camera = (Float,Float,Float)
 
+getCameraX :: Camera -> Float
+getCameraX (x, _, _) = x
+
+getCameraY :: Camera -> Float
+getCameraY (_, y, _) = y
+
+getCameraZ :: Camera -> Float
+getCameraZ (_, _, z) = z
+
 -- | Example state of the program. A list may not be the best choce.
 -- You can roll with it or chose other datastructures.
-data State = State
-             { cells :: [Cell]
-             , camera :: Camera
-             }
+data State = State { 
+    cells :: [Cell], 
+    camera :: Camera
+}
 
 instance HasDrawData State where
   cubes = cells
   cameraPosition = camera
 
-defaultState = State [] (0, 0, 4)
+defaultState = State [(0, 0)] (0, 0, 4)
 
 update :: Event -> State -> State
+update LeftArrow state = 
+    moveCamera (-1, 0, 0) state
+
+update RightArrow state = 
+    moveCamera (1, 0, 0) state
+
+update UpArrow state = 
+    moveCamera (0, 1, 0) state
+
+update DownArrow state = 
+    moveCamera (0, -1, 0) state
+
 update event state = state
+
+moveCamera :: Camera -> State -> State
+moveCamera (x, y, z) prevState =
+    State (cells prevState) (getCameraX cam + x,
+       getCameraY cam + y, getCameraZ cam + z) 
+    where
+        cam = camera prevState
 
 {-| The main simply initiates the rendering and starts the gameloop with
 the an update function for your specific games logic.
