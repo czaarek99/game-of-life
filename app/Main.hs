@@ -41,7 +41,8 @@ getCameraZ (_, _, z) = z
 -- You can roll with it or chose other datastructures.
 data State = State { 
     cells :: [Cell], 
-    camera :: Camera
+    camera :: Camera,
+    running :: Bool
 }
 
 instance HasDrawData State where
@@ -49,7 +50,7 @@ instance HasDrawData State where
   cameraPosition = camera
 
 defaultState :: State
-defaultState = State [(0, 0)] (0, 0, 4)
+defaultState = State [(0, 0)] (0, 0, 4) False
 
 update :: Event -> State -> State
 update LeftArrow state = 
@@ -69,12 +70,15 @@ update (CharPress char) state
     | char == 'k' = moveCamera (0, 0, -1) state
     | otherwise = state
 
+update Space state = 
+    State (cells state) (camera state) (not $ running state)
+
 update event state = state
 
 moveCamera :: Camera -> State -> State
 moveCamera (x, y, z) prevState =
     State (cells prevState) (getCameraX cam + x,
-       getCameraY cam + y, getCameraZ cam + z)
+       getCameraY cam + y, getCameraZ cam + z) (running prevState)
     where
         cam = camera prevState
 
