@@ -48,6 +48,7 @@ instance HasDrawData State where
   cubes = cells
   cameraPosition = camera
 
+defaultState :: State
 defaultState = State [(0, 0)] (0, 0, 4)
 
 update :: Event -> State -> State
@@ -63,12 +64,17 @@ update UpArrow state =
 update DownArrow state = 
     moveCamera (0, -1, 0) state
 
+update (CharPress char) state  
+    | char == 'j' = moveCamera (0, 0, 1) state
+    | char == 'k' = moveCamera (0, 0, -1) state
+    | otherwise = state
+
 update event state = state
 
 moveCamera :: Camera -> State -> State
 moveCamera (x, y, z) prevState =
     State (cells prevState) (getCameraX cam + x,
-       getCameraY cam + y, getCameraZ cam + z) 
+       getCameraY cam + y, getCameraZ cam + z)
     where
         cam = camera prevState
 
