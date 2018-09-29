@@ -42,6 +42,7 @@ instance HasDrawData State where
 defaultState = State [] (0, 0, 4)
 
 update :: Event -> State -> State
+update event state = state
 
 {-| The main simply initiates the rendering and starts the gameloop with
 the an update function for your specific games logic.
