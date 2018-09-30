@@ -29,9 +29,9 @@ import Input.Events
 vertexShader = "shaders/cube.vert"
 fragmentShader =  "shaders/cube.frag"
 
-type Cell = (Float,Float)
-type Camera = (Float,Float,Float)
-type CellMap = Map Float (Set Float)
+type Cell = (Float, Float)
+type Camera = (Float, Float, Float)
+type CellSet = Set (Float, Float)
 
 getCameraX :: Camera -> Float
 getCameraX (x, _, _) = x
@@ -45,7 +45,7 @@ getCameraZ (_, _, z) = z
 -- | Example state of the program. A list may not be the best choce.
 -- You can roll with it or chose other datastructures.
 data State = State { 
-    cells :: CellMap , 
+    cells :: CellSet , 
     camera :: Camera,
     running :: Bool
 }
@@ -55,7 +55,7 @@ instance HasDrawData State where
   cameraPosition = camera
 
 defaultState :: State
-defaultState = State Map.empty (0, 0, 4) False
+defaultState = State Set.empty (0, 0, 4) False
 
 update :: Event -> State -> State
 update LeftArrow state = 
@@ -95,34 +95,17 @@ update Enter state =
 
 update Generation state = state
 
-getCellSetForX :: Float -> CellMap -> Set (Float)
-getCellSetForX x cellMap = 
-    Map.findWithDefault Set.empty x cellMap
-
-hasCell :: Cell -> CellMap -> Bool
+hasCell :: Cell -> CellSet -> Bool
 hasCell (x, y) cells = 
-    if Set.null column then
-        False
-    else
-        Set.member y column
-    where
-        column = getCellSetForX x cells
+    Set.member (x, y) cells
 
-killCell :: Cell -> CellMap -> CellMap
+killCell :: Cell -> CellSet -> CellSet
 killCell (x, y) cells =
-    if Set.null column then
-        cells
-    else
-        Map.insert x (Set.delete y column) cells
-    where
-        column = getCellSetForX x cells
+    Set.delete (x, y) cells
 
-makeCell :: Cell -> CellMap -> CellMap
+makeCell :: Cell -> CellSet -> CellSet
 makeCell (x, y) cells = 
-    Map.insert x (Set.insert y column) cells
-    where
-        column = getCellSetForX x cells
-
+    Set.insert (x, y) cells
 
 moveCamera :: Camera -> State -> State
 moveCamera (x, y, z) prevState =
