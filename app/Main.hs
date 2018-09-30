@@ -82,11 +82,16 @@ update Enter state =
     if running state then
         state
     else
-        State newCells (camera state) (running state)
+        if hasCell cellToChange oldCells then
+            State newCellsKilled (camera state) (running state)
+        else
+            State newCellsBorn (camera state) (running state)
     where
         cam = camera state
         oldCells = cells state
-        newCells = makeCell (getCameraX cam, getCameraY cam) oldCells
+        cellToChange = (getCameraX cam, getCameraY cam)
+        newCellsBorn = makeCell cellToChange oldCells
+        newCellsKilled = killCell cellToChange oldCells 
 
 getCellSetForX :: Float -> CellMap -> Set (Float)
 getCellSetForX x cellMap = 
