@@ -8,6 +8,8 @@ import Control.Concurrent.STM.TChan
 
 import Control.Monad.STM
 
+import Data.Time.Clock
+
 {-| The event is a nicer version of the events that you can get from the
 GLFW library. This exist mainly as a way to
 -}
@@ -18,6 +20,7 @@ data Event = Quit
            | DownArrow
            | Space
            | Enter
+           | Generation
            | CharPress Char
            deriving (Show, Eq, Read)
 
@@ -25,6 +28,7 @@ data Event = Quit
 Sho
 -}
 type EventChan = TChan Event
+
 
 {-| Folds through all events available in a channel until there's
   nothing left.
@@ -40,13 +44,23 @@ foldrEvents chan f prevState = do
 {-| Since handling events from the OS is a bit tedious
 
 -}
-createEventListners :: GLFW.Window -> IO (TChan Event)
+createEventListners :: GLFW.Window -> IO (EventChan)
 createEventListners window = do
   chan <- newTChanIO
   GLFW.setCharCallback window (Just (charCallback chan))
   GLFW.setKeyCallback window (Just (keyCallback chan))
   pure chan
 
+generationDelay :: NominalDiffTime
+generationDelay = 1
+
+data GenerationUpdate = GenerationUpdate 
+updateGeneration :: EventChan -> UTCTime -> UTCTime -> IO(UTCTime)
+updateGeneration chan currentTime lastFrame = 
+    if (diffUTCTime currentTime lastFrame) > generationDelay then
+       atomically $ writeTChan chan Generation >> pure currentTime
+    else
+        pure lastFrame
 
 {-| The callback function used to handle key events. It makes an 'Event'
 out of some of the input. Sends the events into the provided TChan

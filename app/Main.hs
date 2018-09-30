@@ -93,6 +93,8 @@ update Enter state =
         newCellsBorn = makeCell cellToChange oldCells
         newCellsKilled = killCell cellToChange oldCells 
 
+update Generation state = state
+
 getCellSetForX :: Float -> CellMap -> Set (Float)
 getCellSetForX x cellMap = 
     Map.findWithDefault Set.empty x cellMap

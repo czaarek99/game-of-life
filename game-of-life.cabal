@@ -30,6 +30,7 @@ library
                      , mtl
                      , stm
                      , vector
+                     , time
   default-language:    Haskell2010
 
 executable game-of-life
@@ -44,6 +45,7 @@ executable game-of-life
                      , directory
                      , containers
                      , OpenGL
+                     , time
   default-language:    Haskell2010
 
 test-suite game-of-life-test

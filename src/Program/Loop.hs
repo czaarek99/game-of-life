@@ -21,6 +21,8 @@ import qualified Data.Set as Set
 import Data.Map (Map)
 import qualified Data.Map as Map
 
+import Data.Time.Clock
+
 {-| Since we want to be able to have any arbitary datastructure as the
   state of the program there must be some way to retrieve the data
   necessary to draw the objects to the screen. HasDrawData exist for
@@ -44,13 +46,18 @@ runProgram window rd@Cube.RenderData{..} initialState action = do
         Shader.setAspectRatio program (fromIntegral w / fromIntegral h)
     )
   eventChannel <- createEventListners window
-  mainLoop rd window eventChannel initialState action
+  currentTime <- getCurrentTime
+  mainLoop rd window eventChannel initialState action currentTime
 
 {-|
 The actual mainloop, update the state, draws the state, polls events and loops.
 -}
-mainLoop :: (HasDrawData s) => Cube.RenderData -> GLFW.Window -> EventChan -> s -> (Event -> s -> s) -> IO ()
-mainLoop rd@Cube.RenderData{..} window  chan oldState action = do
+
+generationDelay :: NominalDiffTime
+generationDelay = 1
+
+mainLoop :: (HasDrawData s) => Cube.RenderData -> GLFW.Window -> EventChan -> s -> (Event -> s -> s) -> UTCTime -> IO ()
+mainLoop rd@Cube.RenderData{..} window  chan oldState action lastFrame = do
     newState <- foldrEvents chan action oldState
     Shader.initDraw program
     Cube.initDraw rd
@@ -63,4 +70,7 @@ mainLoop rd@Cube.RenderData{..} window  chan oldState action = do
     GLFW.swapBuffers window
     GLFW.pollEvents
     shouldClose <- GLFW.windowShouldClose window
-    unless shouldClose (mainLoop rd window chan newState action)
+    currentTime <- getCurrentTime
+    newFrame <- updateGeneration chan currentTime lastFrame
+    unless shouldClose (mainLoop rd window chan newState action newFrame)
+
