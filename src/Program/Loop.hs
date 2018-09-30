@@ -15,6 +15,11 @@ import Data.StateVar hiding (get)
 
 import Control.Monad
 
+import Data.Set (Set)
+import qualified Data.Set as Set
+
+import Data.Map (Map)
+import qualified Data.Map as Map
 
 {-| Since we want to be able to have any arbitary datastructure as the
   state of the program there must be some way to retrieve the data
@@ -22,7 +27,7 @@ import Control.Monad
   this reason. Just create an instance HasDrawData for you datatype.
 -}
 class HasDrawData a where
-  cubes :: a -> [(Float,Float)]
+  cubes :: a -> Map Float (Set Float)
   cameraPosition :: a -> (Float,Float,Float)
 
 {-|
@@ -46,17 +51,16 @@ The actual mainloop, update the state, draws the state, polls events and loops.
 -}
 mainLoop :: (HasDrawData s) => Cube.RenderData -> GLFW.Window -> EventChan -> s -> (Event -> s -> s) -> IO ()
 mainLoop rd@Cube.RenderData{..} window  chan oldState action = do
-   newState <- foldrEvents chan action oldState
-   Shader.initDraw program
-   Cube.initDraw rd
-   let (camX, camY, camZ) = cameraPosition newState
-   Shader.setCamera program (GL.Vector3 camX camY camZ)
-   mapM_ (\ (px,py) ->
-            Cube.draw rd Shader.red (GL.Vector2 px py)
-         )
-         (cubes newState)
-
-   GLFW.swapBuffers window
-   GLFW.pollEvents
-   shouldClose <- GLFW.windowShouldClose window
-   unless shouldClose (mainLoop rd window chan newState action)
+    newState <- foldrEvents chan action oldState
+    Shader.initDraw program
+    Cube.initDraw rd
+    let (camX, camY, camZ) = cameraPosition newState
+    Shader.setCamera program (GL.Vector3 camX camY camZ)
+    let cubeList = Map.toList $ cubes newState
+    mapM_ (\(x, yValueSet) -> 
+       mapM_ (\y -> 
+            Cube.draw rd Shader.red (GL.Vector2 x y)) yValueSet) cubeList
+    GLFW.swapBuffers window
+    GLFW.pollEvents
+    shouldClose <- GLFW.windowShouldClose window
+    unless shouldClose (mainLoop rd window chan newState action)
