@@ -31,7 +31,7 @@ fragmentShader =  "shaders/cube.frag"
 
 type Cell = (Float, Float)
 type Camera = (Float, Float, Float)
-type CellSet = Set (Float, Float)
+type CellSet = Set Cell
 
 getCameraX :: Camera -> Float
 getCameraX (x, _, _) = x
@@ -93,19 +93,60 @@ update Enter state =
         newCellsBorn = makeCell cellToChange oldCells
         newCellsKilled = killCell cellToChange oldCells 
 
-update Generation state = state
+
+update Generation state = 
+    if isRunning then
+        State newCellMap (camera state) (running state)
+    else
+        state
+    where
+        cellMap = cells state
+        newCellMap = Set.filter (\cell -> survives cell cellMap) (getAllActive cellMap)
+        isRunning = running state
 
 hasCell :: Cell -> CellSet -> Bool
-hasCell (x, y) cells = 
-    Set.member (x, y) cells
+hasCell cell cells = 
+    Set.member cell cells
 
 killCell :: Cell -> CellSet -> CellSet
-killCell (x, y) cells =
-    Set.delete (x, y) cells
+killCell cell cells =
+    Set.delete cell cells
 
 makeCell :: Cell -> CellSet -> CellSet
-makeCell (x, y) cells = 
-    Set.insert (x, y) cells
+makeCell cell cells = 
+    Set.insert cell cells
+
+offset :: Cell -> (Float, Float) -> Cell
+offset (x, y) (dx, dy) =
+    (x + dx, y + dy)
+
+getNeighbors :: Cell -> CellSet
+getNeighbors cell = 
+    Set.fromList [
+        offset cell (dx, dy)
+        | dx <- offsets, dy <- offsets,
+        not (dx == 0 && dy == 0)
+    ]
+    where
+        offsets = [-1, 0, 1]
+
+getLivingNeighbors :: Cell -> CellSet -> CellSet
+getLivingNeighbors cellToCheck cellGrid =
+    Set.filter (\cell -> hasCell cell cellGrid) (getNeighbors cellToCheck)
+
+getAllActive :: CellSet -> CellSet
+getAllActive cells = 
+    Set.union cells $ Set.unions [getNeighbors cell | cell <- Set.toList cells]
+
+survives :: Cell -> CellSet -> Bool
+survives cell cells =
+    if hasCell cell cells then
+        livingNeighborSize == 3 || livingNeighborSize == 2
+    else
+        livingNeighborSize == 3
+    where
+        livingNeighbors = getLivingNeighbors cell cells
+        livingNeighborSize = Set.size livingNeighbors
 
 moveCamera :: Camera -> State -> State
 moveCamera (x, y, z) prevState =
