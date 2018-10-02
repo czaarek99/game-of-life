@@ -78,6 +78,7 @@ update (CharPress char) state
 update Space state = 
     State (cells state) (camera state) (not $ running state)
 
+-- can probably be shortened
 update Enter state = 
     if running state then
         state
