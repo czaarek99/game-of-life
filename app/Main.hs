@@ -116,19 +116,8 @@ makeCell :: Cell -> CellSet -> CellSet
 makeCell cell cells = 
     Set.insert cell cells
 
-offset :: Cell -> (Float, Float) -> Cell
-offset (x, y) (dx, dy) =
-    (x + dx, y + dy)
-
 getNeighbors :: Cell -> CellSet
-getNeighbors cell = 
-    Set.fromList [
-        offset cell (dx, dy)
-        | dx <- offsets, dy <- offsets,
-        not (dx == 0 && dy == 0)
-    ]
-    where
-        offsets = [-1, 0, 1]
+getNeighbors (x, y) = Set.fromList [(x-1, y+1), (x, y+1), (x+1, y+1), (x-1, y), (x+1,y), (x+1, y-1), (x, y-1), (x-1, y-1)]
 
 getLivingNeighbors :: Cell -> CellSet -> CellSet
 getLivingNeighbors cellToCheck cellGrid =
