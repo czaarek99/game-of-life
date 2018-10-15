@@ -14,24 +14,19 @@ import qualified Data.Vector.Storable as S
 import Foreign.Storable (sizeOf)
 import Foreign.Ptr
 
-{-| The data necesary to draw a cube. Contains the shader program
--}
+--The data necesary to draw a cube. Contains the shader program
 data RenderData = RenderData
                 { program :: Shader.Program
                 , vao       :: GL.VertexArrayObject
                 } deriving (Eq,Show)
 
-{-| Initates the data for drawing to
--}
+--Initates the data for drawing to
 initDraw :: RenderData -> IO ()
 initDraw RenderData{..} = do
   Shader.initDraw program
   GL.bindVertexArrayObject  $=! (Just vao)
   GL.vertexAttribArray (GL.AttribLocation 0) $= GL.Enabled
 
-{-|
-Draws a cube
--}
 draw :: RenderData -> Shader.Color -> Shader.Position -> IO ()
 draw RenderData{..} color pos = do
     GL.uniform (Shader.colorUniform program) $= color

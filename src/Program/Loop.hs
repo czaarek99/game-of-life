@@ -32,9 +32,6 @@ class HasDrawData a where
   cubes :: a -> Set (Float, Float)
   cameraPosition :: a -> (Float, Float, Float)
 
-{-|
-Runprogram in the entry point for the main loop it makes sure that things are initated correctly then
--}
 runProgram :: (HasDrawData s) => GLFW.Window -> Cube.RenderData -> s -> (Event -> s -> s) -> IO ()
 runProgram window rd@Cube.RenderData{..} initialState action = do
   Shader.initDraw program
@@ -48,10 +45,6 @@ runProgram window rd@Cube.RenderData{..} initialState action = do
   eventChannel <- createEventListners window
   currentTime <- getCurrentTime
   mainLoop rd window eventChannel initialState action currentTime
-
-{-|
-The actual mainloop, update the state, draws the state, polls events and loops.
--}
 
 generationDelay :: NominalDiffTime
 generationDelay = 1

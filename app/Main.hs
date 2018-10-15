@@ -1,8 +1,6 @@
 {-# LANGUAGE RecordWildCards  #-}
 module Main where
-{-|
-Author: Tomas Möre
--}
+
 import Program.Loop
 import qualified Graphics.Cube as Cube
 import qualified Graphics.Init as Init
@@ -42,9 +40,7 @@ getCameraY (_, y, _) = y
 getCameraZ :: Camera -> Float
 getCameraZ (_, _, z) = z
 
--- | Example state of the program. A list may not be the best choce.
--- You can roll with it or chose other datastructures.
-data State = State { 
+data State = State {
     cells :: CellSet , 
     camera :: Camera,
     running :: Bool
@@ -145,10 +141,6 @@ moveCamera (x, y, z) prevState =
     where
         cam = camera prevState
 
-{-| The main simply initiates the rendering and starts the gameloop with
-the an update function for your specific games logic.
-Remember that this basicly just can do a 2D grid of cubes.
--}
 main :: IO ()
 main = do
   renderDataEither <- loadProgram
@@ -160,8 +152,6 @@ main = do
                  update
     Left e -> putStrLn e
 
-{-| Some bootstap codeupdateGameOfLife
--}
 loadProgram :: IO (Either String (GLFW.Window, Cube.RenderData))
 loadProgram = runExceptT $ do
   window <- ExceptT $ Init.makeBasicWindow "Hello world"

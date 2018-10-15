@@ -1,5 +1,3 @@
-{-| Author: Tomas Möre 2017
--}
 {-# LANGUAGE RecordWildCards #-}
 module Graphics.Shaders where
 
@@ -9,7 +7,7 @@ import Data.Monoid
 
 import qualified Data.ByteString as B
 
-{-| The program data hols all data necessary to "communicate" with the
+{- The program data hols all data necessary to "communicate" with the
   graphics card. The GL.Program is simply an id that enables
 -}
 data Program = Program
@@ -20,16 +18,12 @@ data Program = Program
                , aspectRatioUniform :: GL.UniformLocation
                } deriving (Show, Eq)
 
-{-| Some types for keeping track of datatypes to be sent to the graphics
-  card
--}
 type Color = GL.Vector3 Float
 type Position = GL.Vector2 Float
 type Camera = GL.Vector3 Float
 type AspectRatio = Float
 
-{-| Standard colors
--}
+--Standard colors
 red :: Color
 red = GL.Vector3 1 0 0
 green :: Color
@@ -37,7 +31,7 @@ green = GL.Vector3 0 1 0
 blue :: Color
 blue = GL.Vector3 0 0 1
 
-{-| Need to be called on before any other rendering of the program.
+{- Need to be called on before any other rendering of the program.
 Binds shader program specific data to the right locations on the
 graphics card.
 -}
@@ -48,20 +42,17 @@ initDraw Program{..} = do
   GL.clearColor $= GL.Color4 0 0 0 0
   GL.clear [GL.ColorBuffer, GL.DepthBuffer]
 
-{-|
-Sets the camera position in the program
--}
+--Sets the camera position in the program
 setCamera :: Program -> Camera -> IO ()
 setCamera Program{..} cam =
   GL.uniform cameraUniform $= cam
 
-{-| Sets the aspect ratio in the program
--}
+-- Sets the aspect ratio in the program
 setAspectRatio :: Program -> AspectRatio -> IO ()
 setAspectRatio Program{..} ar =
    GL.uniform aspectRatioUniform $= ar
 
-{-| Loads the two fragment and vertex shaders and tries to construct a
+{- Loads the two fragment and vertex shaders and tries to construct a
 program from them. If something fails on the way the result will be a
 Left String where string is some kind of error message for debug
 purposes.
@@ -83,9 +74,7 @@ loadProgram vertexFp fragmentFp = do
 
 
 
-{-|   Loads the shader given a path to a fragmentshader and vertex shader.
-
--}
+-- Loads the shader given a path to a fragmentshader and vertex shader.
 loadShaderProgram :: FilePath -> FilePath -> IO (Either String GL.Program)
 loadShaderProgram vertexPath fragmentPath = do
   vertexShaderStr <- B.readFile vertexPath

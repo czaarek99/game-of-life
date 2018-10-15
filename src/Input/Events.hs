@@ -10,9 +10,6 @@ import Control.Monad.STM
 
 import Data.Time.Clock
 
-{-| The event is a nicer version of the events that you can get from the
-GLFW library. This exist mainly as a way to
--}
 data Event = Quit
            | LeftArrow
            | RightArrow
@@ -24,15 +21,10 @@ data Event = Quit
            | CharPress Char
            deriving (Show, Eq, Read)
 
-{-| The channel type through which asyncrounous events are passen indo.
-Sho
--}
 type EventChan = TChan Event
 
 
-{-| Folds through all events available in a channel until there's
-  nothing left.
--}
+--Folds through all events available in a channel until there'snothing left.
 foldrEvents :: EventChan -> (Event -> a -> a) -> a -> IO a
 foldrEvents chan f prevState = do
   maybeEvent <- atomically $ tryReadTChan chan
@@ -41,9 +33,7 @@ foldrEvents chan f prevState = do
     Nothing -> pure $ prevState
 
 
-{-| Since handling events from the OS is a bit tedious
-
--}
+--Since handling events from the OS is a bit tedious
 createEventListners :: GLFW.Window -> IO (EventChan)
 createEventListners window = do
   chan <- newTChanIO
@@ -62,7 +52,7 @@ updateGeneration chan currentTime lastFrame =
     else
         pure lastFrame
 
-{-| The callback function used to handle key events. It makes an 'Event'
+{- The callback function used to handle key events. It makes an 'Event'
 out of some of the input. Sends the events into the provided TChan
 -}
 keyCallback :: EventChan ->
@@ -91,9 +81,7 @@ keyCallback chan _ key _ keyState _ =
 
 keyCallback _ _ _ _ _ _ = pure ()
 
-{-|
-For prossesing character press callbacks.
--}
+--For prossesing character press callbacks.
 charCallback :: EventChan -> GLFW.Window -> Char -> IO ()
 charCallback chan window char =
   atomically  $ writeTChan chan $ CharPress char
