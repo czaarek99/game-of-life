@@ -1,15 +1,19 @@
-# Week-5 game-of-life
-Denna vecka ska vi pröva på att göra ett spel, rättare sagt game of
-life! Om ni vill göra något annat coolt spel med åtminstone samma
-komplexitets nivå får ni självklart göra det också!
+# Game of Life Haskell
 
-## Hur man spelar!
+A simple implementation of [Conways game of life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
+in Haskell using OpenGL.
 
-Börja med att lägga ner några celler. Starta sedan spelet och njut av simulationen!
+## How to play
+
+The game is very simple and almost completely automated. Start by placing down a few
+cells then start the game and to see how it evolves.
 
 ### Keybinds
-Pilarna - För att röra sig
-j - För att zomma in
-k - för att zomma ut
-Space - för att pausa/starta spelet
-Enter - För att lägga ner celler manuellt
+Arrow Keys - To move the camera  
+j - To zoom in  
+k - To zoom out  
+Space - To pause/start the game  
+Enter - To toggle cells while in paused mode
+
+## Building
+//TODO
